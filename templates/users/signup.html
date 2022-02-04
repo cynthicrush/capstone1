@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+    <h1 class='h1'>Signup</h1>
+
+    <form id='signup-form' method='POST'>
+        <fieldset>
+        <div class="form-group">
+            {{ form.hidden_tag() }}
+            {% for field in form if field.widget.input_type != 'hidden' %}
+            <p> 
+                {{ field.label(class="form-label mt-4") }}
+                {{ field(class="form-control") }}
+
+                {% for error in field.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                {% endfor %}
+            </p>
+            {% endfor %}
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Signup</button>
+        </fieldset>
+    </form>
+{% endblock %}

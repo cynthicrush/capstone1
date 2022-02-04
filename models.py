@@ -1,9 +1,9 @@
-from inspect import ismethoddescriptor
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 
 bcrypt = Bcrypt()
 db = SQLAlchemy()
+
 
 
 class User(db.Model):
@@ -17,8 +17,6 @@ class User(db.Model):
     password = db.Column(db.Text, nullable=False)
 
     meals = db.relationship('Meal')
-    dish_type = db.relationship('Dish')
-    cuisine_type = db.relationship('Cuisine')
 
     @classmethod
     def signup(cls, username, email, password):
@@ -52,6 +50,7 @@ class Dish(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.Text, nullable=False)
+    meal_id = db.Column(db.Integer, db.ForeignKey('meals.id', ondelete='cascade'))
 
 
 class Cuisine(db.Model):
@@ -61,24 +60,7 @@ class Cuisine(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.Text, nullable=False)
-
-
-class Recipe(db.Model):
-    '''Recipes.'''
-    
-    __tablename__ = 'recipes'
-
-    id = db.Column(db.Integer, primary_key=True)
-    ingredients = db.relationship('Ingredient')
-
-
-class Ingredient(db.Model):
-    '''Ingredients.'''
-    
-    __tablename__ = 'ingredients'
-
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.Text, nullable=False)
+    meal_id = db.Column(db.Integer, db.ForeignKey('meals.id', ondelete='cascade'))
 
 
 class Meal(db.Model):
@@ -88,12 +70,12 @@ class Meal(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.Text, nullable=False)
-    description = db.Column(db.Text, nullable=True)
     meal_image = db.Column(db.Text, nullable=False)
+    recipe = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'))
-    dish_type_id = db.Column(db.Integer, db.ForeignKey('dish_types.id', ondelete='cascade'))
-    cuisine_type_id = db.Column(db.Integer, db.ForeignKey('cuisine_types.id', ondelete='cascade'))
-    recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id', ondelete='cascade'))
+    
+    dish_type = db.relationship('Dish')
+    cuisine_type = db.relationship('Cuisine')
 
 
 
