@@ -147,22 +147,22 @@ def add_meal(user_id):
         flash('Access unauthorized', 'danger')
         return redirect('/')
 
-    form = AddMealForm()
+    user = g.user
+    form = AddMealForm(obj=user)
     user = User.query.get_or_404(user_id)
 
     if form.validate_on_submit():
-        meal = Meal(
-            title=form.title.data,
-            meal_image=form.meal_image.data,
-            dish_type=form.dish_type.data,
-            cuisine_type=form.cuisine_type.data,
-            recipe=form.recipe.data,
-            user_id=user_id,
-            )
+        title = form.title.data
+        meal_image = form.meal_image.data
+        dish_type = form.dish_type.data
+        cuisine_type = form.cuisine_type.data
+        recipe = form.recipe.data
+        meal = Meal(title=title, meal_image=meal_image, dish_type=dish_type, cuisine_type=cuisine_type, recipe=recipe)
+
         g.user.meals.append(meal)
         db.session.commit()
 
-        return redirect(f'/users/{g.user.id}')
+        return redirect(f'/users/{user.id}')
 
     return render_template('meals/new.html', form=form, user=user)
 
