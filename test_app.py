@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from models import db, User
 
-os.environ['DATABASE_URL'] = 'postgresql:///capstone_one_test'
+# os.environ['DATABASE_URL'] = 'postgresql:///capstone_one_test'
 
 from app import app, CURR_USER_KEY
 

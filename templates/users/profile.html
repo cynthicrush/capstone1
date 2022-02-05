@@ -5,5 +5,5 @@
     <h1 class='h1'>{{ user.username }}</h1>
     <div>Email: {{ user.email }}</div>
     <div>Meal(s): {{ user.meals | length }}</div>
-    <a class="btn btn-primary" href='/users/{{user_id}}/add-meal' style='margin-top: 16px;'>Add Meal</a>
+    <a class="btn btn-primary" href='/users/{{user.id}}/add-meal' style='margin-top: 16px;'>Add Meal</a>
 {% endblock %}
