@@ -1,10 +1,11 @@
 from flask_wtf import FlaskForm
+import validators
 from wtforms import StringField, PasswordField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length
 
-dish_types = [('alcohol-cocktail', 'Alcohol-cocktail'), ('biscuits-cookies', 'Biscuits and cookies'), ('bread', 'Bread'), ('cereals', 'Cereals'), ('condiments-sauces', 'Condiments and sauces'), ('drinks', 'Drinks'), ('desserts', 'Desserts'), ('egg', 'Egg'), ('main-course', 'Main course'), ('omelet', 'Omelet'), ('pancake', 'Pancake'), ('preps', 'Preps'), ('preserve', 'Preserve'), ('salad', 'Salad'), ('sandwiches', 'Sandwiches'), ('soup', 'Soup'), ('starter', 'Starter')]
+dish_types = [('Alcohol-cocktail', 'Alcohol-cocktail'), ('Biscuits and cookies', 'Biscuits and cookies'), ('Bread', 'Bread'), ('Cereals', 'Cereals'), ('Condiments and sauces', 'Condiments and sauces'), ('Drinks', 'Drinks'), ('Desserts', 'Desserts'), ('Egg', 'Egg'), ('Main course', 'Main course'), ('Omelet', 'Omelet'), ('Pancake', 'Pancake'), ('Preps', 'Preps'), ('Preserve', 'Preserve'), ('Salad', 'Salad'), ('Sandwiches', 'Sandwiches'), ('Soup', 'Soup'), ('Starter', 'Starter')]
 
-cuisine_types = [('american', 'American'), ('asian', 'Asian'), ('british', 'British'), ('caribbean', 'Caribbean'), ('central-europe', 'Central Europe'), ('chinese', 'Chinese'), ('eastern-europe', 'Eastern Europe'), ('french', 'French'), ('indian', 'Indian'), ('italian', 'Italian'), ('japanese', 'Japanese'), ('kosher', 'Kosher'), ('mediterranean', 'Mediterranean'), ('mexican', 'Mexican'), ('middle-eastern', 'Middle Eastern'), ('nordic', 'Nordic'), ('south-american', 'South American'), ('south-east-asian', 'South East Asian')]
+cuisine_types = [('American', 'American'), ('Asian', 'Asian'), ('British', 'British'), ('Caribbean', 'Caribbean'), ('Central Europe', 'Central Europe'), ('Chinese', 'Chinese'), ('Eastern Europe', 'Eastern Europe'), ('French', 'French'), ('Indian', 'Indian'), ('Italian', 'Italian'), ('Japanese', 'Japanese'), ('Kosher', 'Kosher'), ('Mediterranean', 'Mediterranean'), ('Mexican', 'Mexican'), ('Middle Eastern', 'Middle Eastern'), ('Nordic', 'Nordic'), ('South American', 'South American'), ('South East Asian', 'South East Asian')]
 
 
 class SignupForm(FlaskForm):
@@ -22,11 +23,11 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[Length(min=8)])
 
 
-class AddMealForm(FlaskForm):
-    '''Add a new meal form.'''
+class AddRecipeForm(FlaskForm):
+    '''Add a new recipe form.'''
 
     title = StringField('Title', validators=[DataRequired()])
-    meal_image = StringField('Meal Image', validators=[DataRequired()])
+    recipe_image = StringField('Recipe Image', validators=[DataRequired()])
     dish_type = SelectField('Dish Type', choices=dish_types)
     cuisine_type = SelectField('Cuisine Type', choices=cuisine_types)
     recipe = TextAreaField('Recipe', validators=[Length(min=10)])

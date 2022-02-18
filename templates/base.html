@@ -5,12 +5,66 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yummy</title>
-    <link rel="stylesheet" href="../static/bootstrap.min.css">
-    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../../static/bootstrap.min.css">
+    <link rel="stylesheet" href="../../static/style.css">
+    <script src="https://kit.fontawesome.com/407e7f2bcc.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Yummy</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <ul class="navbar-nav me-auto">
+                    {% if g.user %}
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Cynthia
+                        <span class="visually-hidden">(current)</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if not g.user %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/signup">Signup</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">Login</a>
+                    </li>
+                    {% else %}        
+                    <li class="nav-item">
+                        <a class="nav-link" href="/users/{{g.user.id}}/recipes">Recipes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/users/{{g.user.id}}/likes">Likes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                    
+                    <!-- <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{g.user.username}}</a>
+                        <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/users/{{g.user.id}}/recipes">Recipes</a>
+                        <a class="dropdown-item" href="/users/{{g.user.id}}/likes">Likes</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Separated link</a> 
+                        </div>
+                    </li> -->
+                    {% endif %}
+                </ul>
+                <form class="d-flex" method='POST'>
+                <input class="form-control me-sm-2" type="text" name='query' placeholder="Search">
+                <button class="btn btn-secondary my-2 my-sm-0" type="submit" name='submit' value='search' formaction='/users/search' formmethod="POST">Search</button>
+                </form>
+            </div>
+        </div>
+      </nav>
+    <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky">
+        <div class="container-fluid">
             <a class="navbar-brand" href="/">Yummy</a>
       
             <div class="d-flex" id="navbarColor01">
@@ -23,17 +77,24 @@
                         <a class="nav-link" href="/login">Login</a>
                     </li>
                 {% else %}        
-                    <li class="nav-item">
-                        <a class="nav-link" href="/logout">Logout</a>
+                    
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle show" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="true">{{g.user.username}}</a>
+                        <div class="dropdown-menu show" data-bs-popper="none">
+                            <a class="dropdown-item" href="/users/{{g.user.id}}/recipes">Recipes</a>
+                            <a class="dropdown-item" href="#">Likes</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Separated link</a>
+                        </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/users/{{g.user.id}}">{{g.user.username}}</a>
+                        <a class="nav-link" href="/logout">Logout</a>
                     </li>
                 {% endif %}
                 </ul>
             </div>
         </div>
-    </nav>
+    </nav> -->
 
     <div class='container'>
         {% for category, message in get_flashed_messages(with_categories=True) %}
@@ -45,3 +106,4 @@
     </div>
 </body>
 </html>
+<!-- <a class="nav-link" href="/users/{{g.user.id}}/recipes">{{g.user.username}}</a> -->
