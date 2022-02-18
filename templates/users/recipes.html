@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+    {% if recipes | length == 0 %}
+
+    <h1 class='h1'>{{ user.username }}'s Recipes</h1>
+    <a class="btn btn-secondary btn-lg" href='/recipes/add' style='margin-bottom: 30px;'>Add Recipe</a>
+    <div class='text-info'>You don't have any recipe, click "Add Recipe" to add a one!</div>
+
+    {% else %}
+
+    <h1 class='h1'>{{ user.username }}'s Recipes<a class="btn btn-secondary btn-lg" href='/recipes/add' style='float:right;'>Add Recipe</a></h1>
+
+    {% for recipe in recipes %}
+
+    <div class="card border-secondary mb-3" style="max-width: 300px; display: inline-block; height:700px; margin-right: 20px;">
+      <div class="card-header">{{ recipe.dish_type }}</div>
+      <div class="card-body" style='height:610px; overflow: scroll;'>
+        <h4 class="card-title text-primary">{{ recipe.title }}</h4>
+        <p class="card-text">Cuisine Type: {{ recipe.cuisine_type }}</p>
+        <img src="{{ recipe.recipe_image }}" width='100%' style='border-radius: 10%;'></img>
+        <p class="card-text">
+          <ul>
+              <li class='text-info'>{{ recipe.recipe }}</li>
+          </ul>
+      </p>
+      </div>
+      <div class="card-footer">
+        <form>
+          <button formaction='/recipes/{{ recipe.id }}/delete' formmethod='POST' class="btn btn-primary btn-sm btn-danger" >Delete</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+
+    {% endif %}
+
+{% endblock %}
+
+<!-- <div class="card mb-3">
+  <h3 class="card-header text-primary">{{ recipe.title }}</h3>
+  <div class="card-body">
+    <h5 class="card-title text-muted">Dish Type: {{ recipe.dish_type }}</h5>
+    <h6 class="card-subtitle text-secondary">Cuisine Type: {{ recipe.cuisine_type }}</h6>
+  </div>
+  <img src="{{recipe.recipe_image}}" class="d-block user-select-none" width="100%" height="300" aria-label="Placeholder: Image cap" focusable="false" role="img" preserveAspectRatio="xMidYMid slice" viewBox="0 0 318 180" style="font-size:1.125rem;text-anchor:middle; object-fit: cover; border-radius: 7px;">
+  </img>
+  <div class="card-body">
+    <p class="card-text text-info">{{ recipe.recipe}}</p>
+  </div>
+  <div class="card-footer">
+    <button type="button" class="btn btn-primary btn-sm btn-danger" >Delete</button>
+  </div>
+</div> -->

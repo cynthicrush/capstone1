@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+    
+
+    <h1 class='h1'>{{ user.username }}'s Likes</h1>
+
+    {% if likes | length == 0 %}
+
+    <div class='text-info'>You don't have any likes.</div>
+    
+    {% else %}
+
+    {% for recipe in user.likes %}
+
+    <div class="card border-info mb-3" style="max-width: 300px; display: inline-block; height:700px; margin-right: 20px;">
+      <div class="card-header">{{ recipe.dish_type }}</div>
+      <div class="card-body" style='height:616px; overflow: scroll;'>
+        <h4 class="card-title text-primary">{{ recipe.title }}</h4>
+        <p class="card-text">Cuisine Type: {{ recipe.cuisine_type }}</p>
+        <img src="{{ recipe.recipe_image }}" width='100%' style='border-radius: 10%;'></img>
+        <p class="card-text">
+          <ul>
+              <li class='text-info'>{{ recipe.recipe }}</li>
+          </ul>
+      </p>
+      </div>
+      <div class="card-footer" style='background-color: rgb(243, 243, 243);'>
+        <form>
+            <button formaction='/users/unlike/{{recipe.id}}' formmethod="POST" style='border:0; margin:0; padding:0; background-color: rgb(243, 243, 243);'>
+                <i class="
+                    {{ 'fa-solid' if recipe.id in liked else 'fa-regular'}}
+                    fa-heart 
+                    fa-xl"
+                ></i>               
+            </button>
+        </form>
+        
+    </div>
+
+
+    </div>
+    {% endfor %}
+
+    {% endif %}
+
+{% endblock %}

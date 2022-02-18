@@ -5,8 +5,10 @@ from flask import Flask, render_template, redirect, request, flash, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
-from models import db, connect_db, User, Dish, Cuisine, Meal
-from forms import SignupForm, LoginForm, AddMealForm
+from models import db, connect_db, User, Recipe, Likes
+from forms import SignupForm, LoginForm, AddRecipeForm
+
+import pdb
 
 CURR_USER_KEY = 'curr_user'
 
@@ -20,26 +22,10 @@ app.config['SQLALCHEMY_ECHO'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'shhh secret!')
 
-toolbar = DebugToolbarExtension(app)
+# toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 db.create_all()
-
-
-@app.route('/')
-def homepage():
-    '''Show homepage.'''
-
-    response = requests.get('https://api.edamam.com/api/recipes/v2?type=public', 
-        params={
-            'term': 'seafood',
-            'app_key': 'ccb5ad1a079a4045adc90a739f7f2785',
-            'app_id': 'd097d304',
-            'limit': 7
-        }
-    )
-
-    return render_template('homepage.html', meal=response)
 
 
 # ------- User signup, login, and logout ------- #
@@ -126,53 +112,221 @@ def logout():
 
 # ------- Users route ------- #
 
-@app.route('/users/<int:user_id>')
-def show_profile(user_id):
-    '''Show user profile.'''
+@app.route('/users/<int:user_id>/recipes')
+def show_recipes(user_id):
+    '''Show user's recipes.'''
 
     if not g.user:
         flash('Access unauthorized', 'danger')
         return redirect('/')
 
     user = User.query.get_or_404(user_id)
+    recipes = Recipe.query.filter(Recipe.user_id == user_id).all()
 
-    return render_template('users/profile.html', user=user)
+    return render_template('users/recipes.html', user=user, recipes=recipes)
 
 
-@app.route('/users/<int:user_id>/add-meal', methods=['GET', 'POST'])
-def add_meal(user_id):
-    '''Add a new meal.'''
+@app.route('/users/<int:user_id>/likes')
+def show_likes(user_id):
+    '''Show user's likes.'''
 
     if not g.user:
         flash('Access unauthorized', 'danger')
         return redirect('/')
 
-    user = g.user
-    form = AddMealForm(obj=user)
     user = User.query.get_or_404(user_id)
+    likes = Likes.query.filter(Likes.user_id == user_id).all()
 
-    if form.validate_on_submit():
-        title = form.title.data
-        meal_image = form.meal_image.data
-        dish_type = form.dish_type.data
-        cuisine_type = form.cuisine_type.data
-        recipe = form.recipe.data
-        meal = Meal(title=title, meal_image=meal_image, dish_type=dish_type, cuisine_type=cuisine_type, recipe=recipe)
+    liked_recipe_ids = [recipe.id for recipe in g.user.likes]
 
-        g.user.meals.append(meal)
+    return render_template('users/likes.html', user=user, likes=likes, liked=liked_recipe_ids)
+
+
+@app.route('/users/add_like/<int:recipe_id>', methods=['POST'])
+def add_like(recipe_id):
+    '''Like a recipe.'''
+
+    if not g.user:
+        flash('Access unauthorized', 'danger')
+        return redirect('/')
+
+    current_recipe = Recipe.query.get_or_404(recipe_id)
+    if current_recipe.user_id == g.user.id:
+        flash('Sorry! You are not allowed to like your own recipes.', 'warning')
+        return redirect('/')
+
+    user_likes = g.user.likes
+
+    if current_recipe in user_likes:
+        g.user.likes = [like for like in user_likes if like != current_recipe]
+    else:
+        g.user.likes.append(current_recipe)
+    
+    db.session.commit()
+
+    return redirect('/')
+
+
+@app.route('/users/unlike/<int:recipe_id>', methods=['POST'])
+def unlike(recipe_id):
+    '''Unlike a recipe.'''
+
+    if not g.user:
+        flash('Access unauthorized', 'danger')
+        return redirect('/')
+
+    current_recipe = Recipe.query.get_or_404(recipe_id)
+    if current_recipe.user_id == g.user.id:
+        flash('Sorry! You are not allowed to like your own recipes.', 'warning')
+        return redirect('/')
+
+    user_likes = g.user.likes
+
+    if current_recipe in user_likes:
+        g.user.likes = [like for like in user_likes if like != current_recipe]
+    else:
+        g.user.likes.append(current_recipe)
+    
+    db.session.commit()
+
+    return redirect(f'/users/{g.user.id}/likes')
+
+
+# @.route('/users/search')
+# def show_search():
+#     '''Show search result page.'''
+
+
+
+@app.route('/users/search', methods=['GET', 'POST'])
+def search():
+    '''Search all the recipes in the website.'''
+
+    if not g.user:
+        flash('Access unauthorized', 'danger')
+        return redirect('/')
+
+    recipes = []
+
+    if request.method == 'POST':
+
+        response = requests.get(f'https://api.edamam.com/api/recipes/v2?type=public&q={request.form.get("query")}&app_id=d097d304&app_key=ccb5ad1a079a4045adc90a739f7f2785')
+        results = response.json()
+
+        sample_user = User.query.get(1)
+        # print(results)
+        for recipe in results['hits']:
+            new_dict = {k: v for k, v in recipe['recipe'].items() if k in {'label', 'image',  'ingredientLines', 'cuisineType', 'dishType'}}
+            new_recipe = Recipe(
+                title=new_dict['label'], 
+                recipe_image=new_dict['image'], 
+                recipe=new_dict['ingredientLines'], 
+                cuisine_type=new_dict['cuisineType'][0].capitalize(), 
+                dish_type=new_dict.get('dishType', ['none'])[0].capitalize()
+                # dish_type=new_dict['dishType'][0].capitalize() 
+            )
+            # recipe_data = {
+            #     'title': new_dict['label'], 
+            #     'recipe_image': new_dict['image'], 
+            #     'recipe': new_dict['ingredientLines'], 
+            #     'cuisine_type': new_dict['cuisineType'][0].capitalize(), 
+            #     'dish_type': new_dict.get('dishType', ['None'][0].capitalize())
+            #     # new_dict['dishType'][0].capitalize()
+            # }
+            recipes.append(new_recipe)
+            # new_recipe = Recipe(recipe_data)
+        # db.session.add(new_recipe)
+            sample_user.recipes.append(new_recipe)
         db.session.commit()
 
-        return redirect(f'/users/{user.id}')
+        # recipes = Recipe.query.all()
 
-    return render_template('meals/new.html', form=form, user=user)
+    
+    return render_template('users/search.html', recipes=recipes)
+
+@app.route('/users/like/<int:recipe_id>', methods=['POST'])
+def like(recipe_id):
+    '''Unlike a recipe.'''
+
+    if not g.user:
+        flash('Access unauthorized', 'danger')
+        return redirect('/')
+
+    current_recipe = Recipe.query.get_or_404(recipe_id)
+    if current_recipe.user_id == g.user.id:
+        flash('Sorry! You are not allowed to like your own recipes.', 'warning')
+        return redirect('/')
+
+    user_likes = g.user.likes
+
+    if current_recipe in user_likes:
+        g.user.likes = [like for like in user_likes if like != current_recipe]
+    else:
+        g.user.likes.append(current_recipe)
+    
+    db.session.commit()
+
+    return redirect('/users/search')
+    
 
 
+# ------- Recipes route ------- #
+
+@app.route('/recipes/add', methods=['GET', 'POST'])
+def add_recipe():
+    '''Add a new recipe.'''
+
+    if not g.user:
+        flash('Access unauthorized', 'danger')
+        return redirect('/')
+
+    form = AddRecipeForm()
+    # pdb.set_trace()
+    if form.validate_on_submit():
+        recipe = Recipe(
+            title =form.title.data,
+            recipe_image =form.recipe_image.data,
+            dish_type =form.dish_type.data,
+            cuisine_type =form.cuisine_type.data,
+            recipe =form.recipe.data
+        )
+        
+        g.user.recipes.append(recipe)
+        db.session.commit()
+
+        return redirect(f'/users/{g.user.id}/recipes')
+
+    return render_template('recipes/new.html', form=form)
 
 
+@app.route('/recipes/<int:recipe_id>/delete', methods=['POST'])
+def delete_recipe(recipe_id):
+    '''Delete recipes.'''
 
-# ------- Meals route ------- #
+    if not g.user:
+        flash('Access unauthorized', 'danger')
+        return redirect('/')
 
-# @app.route('meals/<uri>')
-# def show_meal_details(url):
-#     '''Show meal details.'''
+    recipe = Recipe.query.get_or_404(recipe_id)
+    db.session.delete(recipe)
+    db.session.commit()
 
+    return redirect(f'/users/{g.user.id}/recipes')
+
+
+# ------- Home route ------- #
+
+@app.route('/')
+def homepage():
+    '''Show homepage.'''
+
+    recipes = Recipe.query.all()
+
+    if g.user:
+        liked_recipe_ids = [recipe.id for recipe in g.user.likes]
+    
+        return render_template('homepage.html', recipes=recipes, likes=liked_recipe_ids)
+    
+    return render_template('homepage-anon.html')
+
+    

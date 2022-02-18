@@ -5,7 +5,6 @@ bcrypt = Bcrypt()
 db = SQLAlchemy()
 
 
-
 class User(db.Model):
     '''Users.'''
 
@@ -16,7 +15,8 @@ class User(db.Model):
     email = db.Column(db.Text, nullable=False, unique=True)
     password = db.Column(db.Text, nullable=False)
 
-    meals = db.relationship('Meal')
+    recipes = db.relationship('Recipe')
+    likes = db.relationship('Recipe', secondary='likes')
 
     @classmethod
     def signup(cls, username, email, password):
@@ -43,40 +43,31 @@ class User(db.Model):
         return False
 
 
-class Dish(db.Model):
-    '''Dish types.'''
-    
-    __tablename__ = 'dish_types'
+class Recipe(db.Model):
+    '''Recipes.'''
+
+    __tablename__ = 'recipes'
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.Text, nullable=False)
-    meal_id = db.Column(db.Integer, db.ForeignKey('meals.id', ondelete='cascade'))
-
-
-class Cuisine(db.Model):
-    '''Cuisine types.'''
-    
-    __tablename__ = 'cuisine_types'
-
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.Text, nullable=False)
-    meal_id = db.Column(db.Integer, db.ForeignKey('meals.id', ondelete='cascade'))
-
-
-class Meal(db.Model):
-    '''Meals.'''
-
-    __tablename__ = 'meals'
-
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.Text, nullable=False)
-    meal_image = db.Column(db.Text, nullable=False)
+    recipe_image = db.Column(db.Text, nullable=False)
+    dish_type = db.Column(db.Text, nullable=False)
+    cuisine_type = db.Column(db.Text, nullable=False)
     recipe = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'))
-    
-    dish_type = db.relationship('Dish')
-    cuisine_type = db.relationship('Cuisine')
 
+
+    user = db.relationship('User', overlaps='recipes')
+
+
+class Likes(db.Model):
+    '''Mapping user likes.'''
+
+    __tablename__ = 'likes'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'))
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.id', ondelete='cascade'))
 
 
 def connect_db(app):

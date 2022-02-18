@@ -1,14 +1,18 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
 
-    <h1 class='h1'>Welcome to Yummy!</h1>
+    <h1 class='h1'>Search Recipe</h1>
 
     {% for recipe in recipes %}
 
     <div class="card border-primary mb-3" style="max-width: 300px; display: inline-block; height:700px; margin-right: 20px;">
         <div class="card-header">{{ recipe.dish_type }}</div>
+        <!-- {% if recipe.dish_type %}
+        <div class="card-header">{{ recipe.dish_type[0].capitalize() }}</div>
+        {% else %}
+        <div class="card-header">None</div>
+        {% endif %} -->
         <div class="card-body" style='height:616px; overflow: scroll;'>
             <h4 class="card-title text-primary">{{ recipe.title }}</h4>
             <p class="card-text">Cuisine Type: {{ recipe.cuisine_type }}</p>
@@ -24,7 +28,7 @@
 
             <div class="card-footer" style='background-color: rgb(243, 243, 243);'>
                 <form>
-                    <button formaction='/users/add_like/{{recipe.id}}' formmethod="POST" style='border:0; margin:0; padding:0; background-color: rgb(243, 243, 243);'>
+                    <button formaction='/users/like/{{recipe.id}}' formmethod="POST" style='border:0; margin:0; padding:0; background-color: rgb(243, 243, 243);'>
                         <i class="
                             {{ 'fa-solid' if recipe.id in likes else 'fa-regular'}}
                             fa-heart 
@@ -42,29 +46,3 @@
     {% endfor %}
 
 {% endblock %}
-
-<!-- <div class='cards-box'>
-        <div class="card border-primary mb-3 sticky-parent" style="max-width: 300px; display: inline-block; height:700px; overflow: scroll; margin-right: 20px;">
-            <div class="card-header">
-                <div>{{recipe.dish_type}}</div>
-            </div>
-            <div class="card-body">
-            <h4 class="card-title text-primary">{{ recipe.title }}</h4>
-            <p class=text-secondary>Cuisine Type: {{ recipe.cuisine_type }}
-            </p>
-            <img src="{{ recipe.image }}" width='100%' style='border-radius: 10%;'></img>
-            <p class="card-text">
-                <ul>
-                    <li class='text-info'>{{ recipe.recipe }}</li>
-                </ul>
-            </p>
-            </div>
-            {% if g.user %}
-            <div class="card-footer sticky">
-                
-                <i class="fa-regular fa-heart"></i>                
-                
-            </div>
-            {% endif %}
-        </div> 
-    </div>-->
