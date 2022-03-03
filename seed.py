@@ -21,10 +21,11 @@ sample_user = User.signup(username='Recipe King', email='recipeking@email.com', 
 db.session.add(sample_user)
 
 for recipe in recipes['hits']:
-    new_dict = {k: v for k, v in recipe['recipe'].items() if k in {'label', 'image',  'ingredientLines', 'cuisineType', 'dishType'}}
+    new_dict = {k: v for k, v in recipe['recipe'].items() if k in {'label', 'image',  'ingredientLines', 'cuisineType', 'dishType', 'url'}}
     new_recipe = Recipe(
         title=new_dict['label'], 
         recipe_image=new_dict['image'], 
+        url=new_dict['url'], 
         recipe=new_dict['ingredientLines'], 
         cuisine_type=new_dict['cuisineType'][0].capitalize(), 
         dish_type=new_dict['dishType'][0].capitalize()

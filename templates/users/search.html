@@ -5,7 +5,7 @@
     <h1 class='h1'>Search Recipe</h1>
 
     {% for recipe in recipes %}
-
+    <!-- <h1>{{ recipe[0] }}</h1> -->
     <div class="card border-primary mb-3" style="max-width: 300px; display: inline-block; height:700px; margin-right: 20px;">
         <div class="card-header">{{ recipe.dish_type }}</div>
         <!-- {% if recipe.dish_type %}
@@ -17,6 +17,7 @@
             <h4 class="card-title text-primary">{{ recipe.title }}</h4>
             <p class="card-text">Cuisine Type: {{ recipe.cuisine_type }}</p>
             <img src="{{ recipe.recipe_image }}" width='100%' style='border-radius: 10%;'></img>
+            <p class="card-text" style='margin-top: 10px;'>Recipe Details: <a href='{{ recipe.url}}' target="_blank">{{ recipe.title}}</a></p>
             <div class="card-text">
                 <ul>
                     <li class='text-info'>{{ recipe.recipe }}</li>
