@@ -39,7 +39,6 @@ class User(db.Model):
             is_authenticated = bcrypt.check_password_hash(user.password, password)
             if is_authenticated:
                 return user
-
         return False
 
 
@@ -54,6 +53,7 @@ class Recipe(db.Model):
     dish_type = db.Column(db.Text, nullable=False)
     cuisine_type = db.Column(db.Text, nullable=False)
     recipe = db.Column(db.Text, nullable=False)
+    url = db.Column(db.Text, unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'))
 
 
