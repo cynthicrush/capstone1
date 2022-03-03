@@ -192,56 +192,7 @@ def unlike(recipe_id):
 
     return redirect(f'/users/{g.user.id}/likes')
 
-# ---------- Solution 1
-# @app.route('/users/search', methods=['GET', 'POST'])
-# def search():
-#     '''Search all the recipes in the website.'''
 
-#     if not g.user:
-#         flash('Access unauthorized', 'danger')
-#         return redirect('/')
-
-#     recipes = []
-
-#     if request.method == 'POST':
-#         if request.form:
-#             search_term = request.form.get('query')
-#             session[CURR_SEARCH_REQUEST] = search_term
-#         else:
-#             search_term = session[CURR_SEARCH_REQUEST]
-#         search_term = request.form.get('query')
-#         response = requests.get(f'https://api.edamam.com/api/recipes/v2?type=public&q={search_term}&app_id=d097d304&app_key=ccb5ad1a079a4045adc90a739f7f2785')
-#         results = response.json()
-
-#         sample_user = User.query.get(1)
-
-#         for recipe in results['hits']:
-#             new_dict = {k: v for k, v in recipe['recipe'].items() if k in {'label', 'image',  'ingredientLines', 'cuisineType', 'dishType', 'url'}}
-#             url = new_dict['url']
-#             # existing_recipe = Recipe.query.filter(Recipe.url==url).all()
-#             existing_recipes = Recipe.query.all()
-#             for existing_recipe in existing_recipes:
-#                 if existing_recipe and len(existing_recipe) > 0:
-#                     sample_user.recipes.append(existing_recipe)
-#                 else:
-#                     new_recipe = Recipe(
-#                         title=new_dict['label'], 
-#                         recipe_image=new_dict['image'], 
-#                         url=new_dict['url'], 
-#                         recipe=new_dict['ingredientLines'], 
-#                         cuisine_type=new_dict['cuisineType'][0].capitalize(), 
-#                         dish_type=new_dict.get('dishType', ['none'])[0].capitalize()
-#                     )
-                                    
-#                     sample_user.recipes.append(new_recipe)
-#             recipes.append(new_recipe)
-#         db.session.commit()
-    
-#     return render_template('users/search.html', recipes=recipes)
-
-
-
-# ---------- Solution 2
 @app.route('/users/search', methods=['GET', 'POST'])
 def search():
     '''Search all the recipes in the website.'''
@@ -264,7 +215,6 @@ def search():
         results = response.json()
 
         sample_user = User.query.get(1)
-        # print(results)         
 
         for recipe in results['hits']:
             new_dict = {k: v for k, v in recipe['recipe'].items() if k in {'label', 'image',  'ingredientLines', 'cuisineType', 'dishType', 'url'}}
@@ -274,7 +224,6 @@ def search():
             if existing_recipe:
                 recipes_list.append(existing_recipe)
             else:
-                # pdb.set_trace()
                 new_recipe = Recipe(
                 title=new_dict['label'], 
                 recipe_image=new_dict['image'], 
@@ -294,53 +243,6 @@ def search():
     
     return render_template('users/search.html', recipes=recipes_list, likes=liked_recipe_ids)
 
-
-# ---------- Original
-# @app.route('/users/search', methods=['GET', 'POST'])
-# def search():
-#     '''Search all the recipes in the website.'''
-
-#     if not g.user:
-#         flash('Access unauthorized', 'danger')
-#         return redirect('/')
-
-#     recipes = []
-
-#     if request.method == 'POST':
-
-#         response = requests.get(f'https://api.edamam.com/api/recipes/v2?type=public&q={request.form.get("query")}&app_id=d097d304&app_key=ccb5ad1a079a4045adc90a739f7f2785')
-#         results = response.json()
-
-#         sample_user = User.query.get(1)
-#         # print(results)
-#         for recipe in results['hits']:
-#             new_dict = {k: v for k, v in recipe['recipe'].items() if k in {'label', 'image',  'ingredientLines', 'cuisineType', 'dishType'}}
-#             new_recipe = Recipe(
-#                 title=new_dict['label'], 
-#                 recipe_image=new_dict['image'], 
-#                 recipe=new_dict['ingredientLines'], 
-#                 cuisine_type=new_dict['cuisineType'][0].capitalize(), 
-#                 dish_type=new_dict.get('dishType', ['none'])[0].capitalize()
-#                 # dish_type=new_dict['dishType'][0].capitalize() 
-#             )
-#             # recipe_data = {
-#             #     'title': new_dict['label'], 
-#             #     'recipe_image': new_dict['image'], 
-#             #     'recipe': new_dict['ingredientLines'], 
-#             #     'cuisine_type': new_dict['cuisineType'][0].capitalize(), 
-#             #     'dish_type': new_dict.get('dishType', ['None'][0].capitalize())
-#             #     # new_dict['dishType'][0].capitalize()
-#             # }
-#             recipes.append(new_recipe)
-#             # new_recipe = Recipe(recipe_data)
-#         # db.session.add(new_recipe)
-#             sample_user.recipes.append(new_recipe)
-#         db.session.commit()
-
-#         # recipes = Recipe.query.all()
-
-    
-#     return render_template('users/search.html', recipes=recipes)
 
 @app.route('/users/like/<int:recipe_id>', methods=['POST'])
 def like(recipe_id):
