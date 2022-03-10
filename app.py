@@ -1,4 +1,5 @@
 import os
+import re
 import requests
 
 from flask import Flask, render_template, redirect, request, flash, session, g
@@ -15,7 +16,11 @@ CURR_SEARCH_REQUEST = 'curr_query'
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = (os.environ.get('DATABASE_URL', 'postgresql:///capstone_one'))
+uri = os.environ.get('DATABASE_URL', 'postgresql:///capstone_one')
+if uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+# rest of connection code using the connection string `uri`
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
 
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
