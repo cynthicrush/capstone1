@@ -15,7 +15,7 @@ API: https://developer.edamam.com/edamam-docs-recipe-api
     ▪️ You could search for existing recipes.
     ▪️ You could like recipes and view your likes.
 
-⚫️ What technology stacks that I used for the website?
+⚫️ What technology stacks that are used for the website?
 
     ▪️ Front-end: Python
     ▪️ Back-end: Python Flask
